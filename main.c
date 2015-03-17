@@ -25,7 +25,7 @@ int command_count;
 
 int main (int argc, char **argv)
 {
-    // Number of ??
+    // Used to loop forever
     int count = 1;
     
     // Process ID
@@ -33,31 +33,43 @@ int main (int argc, char **argv)
 
     while(count) /* main loop */
     {
-        /*  */
+        /* Cursor */
         printf("\n$ ");
+
+        /* Now we read the command line from the user */
         fgets(command.full, MAX_COMMAND_LINE_SIZE, stdin);
+
+        /* Changing the last character to \0. 
+         * For some reason it doesn't work if there's a \n at the end */
         if(0 < strlen(command) && '\n' != command[0])
         {
             command[strlen(command) - 1] = '\0';
         }
 
+        /* Calling the separateStringByBar to tokenize the command line */
         command_count = separateStringByBar(command.full, command.spaceTok);
 
+        /* Executing the command */
         execute();
     }
+
+    /* Exiting the shell */
     printf("Bye Byee\n");
     return EXIT_SUCCESS;
 }
 
-int separateStringBySpace(char* line, char** buffer) /* Breaks de command string */
+/* Breaks de command string separated by space */
+int separateStringBySpace(char* line, char** buffer) 
 {
     int i;
     char* ch;
     buffer = (char**) malloc (MAX_NUMBER_OF_ARGUMENTS*sizeof(char*));
 
+    /* Token used to separate the command string */
     ch = strtok(line, " ");
-    i = 0;
 
+
+    i = 0;
     while (ch != NULL)
     {
         buffer[i] = (char *) malloc (strlen(ch)*sizeof(char));
@@ -70,7 +82,8 @@ int separateStringBySpace(char* line, char** buffer) /* Breaks de command string
     return i;
 }
 
-int separateStringByBar(char* line, char** buffer) /* Breaks de command string */
+/* Breaks de command string separated by bar character*/
+int separateStringByBar(char* line, char** buffer) 
 {
     int i;
     char* ch;
@@ -112,8 +125,13 @@ bool execute(char* line) /* Execute the command line given by the user */
     {
         wait(&status);
     }
+
+    /* These are the pipelines 
+     * It goes backwards
+     */
     else
     {
+        /**/
         if(current_command == 0)
         {
             close(1); /* close normal stdout */
@@ -141,11 +159,10 @@ bool execute(char* line) /* Execute the command line given by the user */
     }
 }
 
-/* Built in function. */
-
+/* Built in functions */
 
 /* Return 1 if command is executed as a builtin function;
-   0 otherwise. */
+   0 otherwise */
 
 int exec_builtin (char **line)
 {
@@ -192,6 +209,8 @@ int cd (char *path)
     }
 }
 
+/* Help command.
+   It's actually useless */
 void help ()
 {
     printf("Hi! You asked for help but I know as much as you do.\nSorry :)\n");
